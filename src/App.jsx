@@ -1,10 +1,14 @@
 import React from "react";
+import { BrowserRouter as Router } from "react-router-dom";
+import Navbar from "./components/Navbar";
 
 const App = () => {
   return (
-    <div className="bg-purple-500">
-      <h1 class="text-3xl font-bold underline">Hello world!</h1>
-    </div>
+    <Router>
+      <div className="flex flex-col justify-between h-screen ">
+        <Navbar />
+      </div>
+    </Router>
   );
 };
 
