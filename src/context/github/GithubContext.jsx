@@ -9,6 +9,8 @@ const GITHUB_TOKEN = "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";
 export const GithubProvider = ({ children }) => {
   const initialState = {
     users: [],
+    user: {},
+    repos: [],
     loading: false,
   };
 
@@ -33,6 +35,51 @@ export const GithubProvider = ({ children }) => {
     });
   };
 
+  // single user
+  const getUser = async (login) => {
+    setLoading();
+
+    const res = await fetch(`${GITHUB_URL}/users/${login}`, {
+      headers: { Authorization: `${GITHUB_TOKEN}` },
+    });
+
+    const data = await res.json();
+
+    if (res.status === 404) {
+      window.location = "/notfound";
+    } else {
+      dispatch({
+        type: "GET_USER",
+        payload: data,
+      });
+    }
+  };
+
+  // get user repos
+  const getUserRepos = async (login) => {
+    setLoading();
+
+    const params = new URLSearchParams({
+      sort: "created",
+      per_page: 10,
+    });
+
+    const res = await fetch(`${GITHUB_URL}/users/${login}/repos?${params}`, {
+      headers: { Authorization: `${GITHUB_TOKEN}` },
+    });
+
+    const data = await res.json();
+
+    if (res.status === 404) {
+      window.location = "/notfound";
+    } else {
+      dispatch({
+        type: "GET_REPOS",
+        payload: data,
+      });
+    }
+  };
+
   // clear
   const clearUsers = () =>
     dispatch({
@@ -45,8 +92,9 @@ export const GithubProvider = ({ children }) => {
   return (
     <GithubContext.Provider
       value={{
-        users: state.users,
-        loading: state.loading,
+        ...state,
+        getUser,
+        getUserRepos,
         clearUsers,
         searchUsers,
       }}
