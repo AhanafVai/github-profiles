@@ -1,16 +1,29 @@
-const GITHUB_URL = "https://api.github.com";
-const GITHUB_TOKEN = "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";
+import axios from "axios";
 
-// get Search results
+const GITHUB_URL = "https://api.github.com";
+const GITHUB_TOKEN = "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";
+
+const github = axios.create({
+  baseURL: GITHUB_URL,
+  headers: { Authorization: `token ${GITHUB_TOKEN}` },
+});
+
+// Get search results
 export const searchUsers = async (text) => {
   const params = new URLSearchParams({
     q: text,
   });
 
-  const res = await fetch(`${GITHUB_URL}/search/users?${params}`, {
-    headers: { Authorization: `${GITHUB_TOKEN}` },
-  });
+  const response = await github.get(`/search/users?${params}`);
+  return response.data.items;
+};
 
-  const data = await res.json();
-  return data.items;
+// Get user and repos
+export const getUserAndRepos = async (login) => {
+  const [user, repos] = await Promise.all([
+    github.get(`/users/${login}`),
+    github.get(`/users/${login}/repos`),
+  ]);
+
+  return { user: user.data, repos: repos.data };
 };
